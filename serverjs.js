@@ -3,9 +3,10 @@ const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require ("body-parser");
-const router = express.Router();
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
 
+app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -62,6 +63,32 @@ app.post('/api/login', async (req, res) => {
     } catch (err) {
         console.error("Login error:", err);
         res.status(500).json({ success: false, message: "Server error" });
+    }
+});
+
+app.post('/send-email', async (req, res) => {
+    const {name, email, message} = req.body;
+
+    let transporter = nodemailer.createTransport ({
+        service: 'gmail',
+        auth: {
+            user: 'garcia.daniel23256@gmail.com',
+            pass: 'Danny4504'
+        }
+    });
+
+    try {
+        await transporter.sendMail({
+            from: email,
+            to: 'garcia.daniel23256@gmail.com',
+            subject: `Contact Form: ${name}`,
+            text: message
+        })
+        res.send("Message delievered successfully");
+    }
+    catch(err){
+        console.error(err);
+        res.status(500).send('Failed to send message.');
     }
 });
 
